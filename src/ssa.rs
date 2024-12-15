@@ -245,10 +245,12 @@ impl SSA {
     pub fn parse<S: AsRef<str>>(content: S) -> Result<SSA, SSAError> {
         let mut line_num = 0;
 
-        let mut blocks = vec![vec![]];
+        let mut blocks: Vec<Vec<&str>> = vec![];
         for line in content.as_ref().lines() {
             if line.trim().is_empty() {
-                blocks.push(vec![])
+                continue;
+            } else if line.starts_with("[") && line.ends_with("]") {
+                blocks.push(vec![line])
             } else {
                 blocks.last_mut().unwrap().push(line)
             }
