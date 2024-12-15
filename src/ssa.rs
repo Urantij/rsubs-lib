@@ -184,6 +184,8 @@ pub enum SSAEventLineType {
 /// `00:00:20.00` and it can be represented using [Time::to_ass_string]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SSAEvent {
+    /// "Dialogue"
+    pub event_type: String,
     /// Subtitles having different layer number will be ignored during the collusion detection.
     /// Higher numbered layers will be drawn over the lower numbered.
     pub layer: u32,
@@ -216,6 +218,7 @@ impl Eq for SSAEvent {}
 impl Default for SSAEvent {
     fn default() -> Self {
         SSAEvent {
+            event_type: "Dialogue".to_string(),
             layer: 0,
             start: Time::from_hms(0, 0, 0).unwrap(),
             end: Time::from_hms(0, 0, 0).unwrap(),
@@ -443,7 +446,7 @@ impl Display for SSA {
                 event.effect.to_string(),
                 event.text.to_string()
             ];
-            lines.push(format!("Dialogue: {}", line.join(",")))
+            lines.push(format!("{}: {}", event.event_type, line.join(",")))
         }
 
         write!(f, "{}", lines.join("\n"))
@@ -850,6 +853,7 @@ mod parse {
             let line_list: Vec<&str> = line.trim().splitn(10, ',').collect();
 
             events.push(SSAEvent {
+                event_type: line_type.to_string(),
                 layer: get_line_value(
                     &headers,
                     "Layer",
